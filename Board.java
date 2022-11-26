@@ -20,9 +20,9 @@ public class Board extends JPanel {
 
 /// Constructeur
     public Board(Fenetre container) {
-        setJeu(new Partie());
-        getJeu().addJoueur("To");
-        getJeu().addJoueur("Niavo");
+        setJeu(new Partie("serveur"));
+        // getJeu().addJoueur("To");
+        // getJeu().addJoueur("Niavo");
 
         setContainer(container);
         initGameBoard();
@@ -49,7 +49,7 @@ public class Board extends JPanel {
 
     public void initGameBoard() {
         /// Preprare l'affichage principale
-        new Input(getJeu().getListesJoueur().elementAt(0), this);
+        new Input(getJeu().getJoueurPrincipale(), this);
         setFocusable(true);
         requestFocus();
         setLayout(null);

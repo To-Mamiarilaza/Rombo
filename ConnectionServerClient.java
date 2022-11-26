@@ -1,0 +1,39 @@
+package socket;
+import ecoute.Listen;
+import java.io.*;
+import java.net.*;
+import java.util.Vector;
+
+public class ConnectionServerClient extends Thread {
+/// Attributs
+    Server serveur;
+
+/// Encapsulation
+    public void setServeur(Server serveur) {this.serveur = serveur;}
+    public Server getServeur() {return this.serveur;}
+
+/// Constructeur
+    public ConnectionServerClient(Server serveur) {
+        setServeur(serveur);
+        this.start();
+    }
+
+/// Fonctions
+    public void listenClient() throws Exception {
+        /// Ecoute l'entree des clients
+        Socket newSocket = getServeur().getServeur().accept(); 
+        System.out.println("---> Un client entre !");
+        getServeur().getClients().add(newSocket);
+        getServeur().getOutputListes().add(new DataOutputStream(newSocket.getOutputStream()));
+        new Listen(newSocket);
+    }
+
+    public void run() {
+        try {
+            listenClient();
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+    }
+
+}

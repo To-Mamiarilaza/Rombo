@@ -2,22 +2,18 @@ package socket;
 
 public class NetworkManager {
 /// Attributs
-    Server serveur;
-    Client client;
+    ConnectionMode mode;
 
 /// Encapsulation
-    public void setServeur(Server serveur) {this.serveur = serveur;}
-    public Server getServeur() {return this.serveur;}
-
-    public void setClient(Client client) {this.client = client;}
-    public Client getClient() {return this.client;}
+    public void setConnectionMode(ConnectionMode mode) {this.mode = mode;}
+    public ConnectionMode getConnectionMode() {return this.mode;}
 
 /// Constructeur
     public NetworkManager(String mode) {
         if(mode.equals("serveur")) {
-            setServeur(new Server());
+            setConnectionMode(new Server());
         }
-        else setClient(new Client());
+        else setConnectionMode(new Client());
     }
 
 /// Fonctions de classe

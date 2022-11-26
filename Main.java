@@ -8,9 +8,9 @@ public class Main {
         System.out.println("DEVELOPPEMENT JEU ROMBO");
         
 
-        // Fenetre fenetre = new Fenetre();
+        Fenetre fenetre = new Fenetre();
 
         // Test reseau
-        NetworkManager gerantReseaux = new NetworkManager("client");
+        // NetworkManager gerantReseaux = new NetworkManager("client");
     }
 }

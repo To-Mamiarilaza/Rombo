@@ -100,11 +100,8 @@ public class Joueur extends GameObject {
         // Changer la fleche actif
         setActif(getActif() + 1);
         int indice = getActif() % 2;
-        System.out.println("Indice de l'actif : " + indice);
         if (!getListesFleche()[indice].getTir()) {
             getListesFleche()[indice].setActif(true);        // Active le nouveau fleche
-            System.out.println("J'active l'autre fleche");
-            System.out.println("-+ " + getListesFleche()[indice].getActif());
         }
     }
 

@@ -64,8 +64,6 @@ public class Fleche extends GameObject {
     public void checkDuration() {
         // Attends un peu avant de recharger la balle
         if (!getRechargement() && System.currentTimeMillis() - getDuration() >= 500 && !getProprietaire().getListesFleche()[getProprietaire().getNextIndiceActif()].getTir()) {
-            System.out.println("-----------------------------------");
-            System.out.println("Changement apres 0.5 seconde");
             setRechargement(true);
             getProprietaire().changeActifFleche();
         }

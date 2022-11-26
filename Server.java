@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Vector;
 
-public class Server extends Thread {
+public class Server extends ConnectionMode {
 /// Attributs
     ServerSocket serveur;
     Vector<Socket> clients;
@@ -27,35 +27,37 @@ public class Server extends Thread {
             setClients(new Vector<Socket>());
             setOutputListes(new Vector<DataOutputStream>());
             System.out.println("Ecoute des clients entrant");
-            this.start();
+            new ConnectionServerClient(this);       // Ecoute tous les Client qui entre en permanant
+            // testMessage();
         } catch(Exception e) {
             System.out.println(e);
         }
     }
 
-    public void listenClientMessage() {
-
-    }
-
-    public void listenClient() throws Exception {
-        /// Ecoute l'entree des clients
-        Socket newSocket = getServeur().accept(); 
-        System.out.println("---> Un client entre !");
-        getClients().add(newSocket);
-        getOutputListes().add(new DataOutputStream(newSocket.getOutputStream()));
-        new Listen(newSocket);
-        if (getClients().size() < 2) {
-            listenClient();
-        }
-    }
-
-    public void run() {
+/// Fonction de classes
+    public void sendMessage(String message) {
+        /// Pour envoyer message a tous les clients 
         try {
-            listenClient();
-            System.out.println("Clients complet : vous pouvez envoyer des messages maintenant .");
-            listenClientMessage();
-        } catch(Exception e) {
+            for(int i = 0; i < getOutputListes().size(); i++) {
+                getOutputListes().elementAt(i).writeUTF(message);
+                getOutputListes().elementAt(i).flush();
+                System.out.println("----> message envoye depuis serveur");
+            }
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
+
+    public void testMessage() {
+        /// test envoie de message au client
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            while (true) {
+                sendMessage(reader.readLine());
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 }

@@ -2,12 +2,11 @@ package ecoute;
 import java.io.*;
 import java.net.*;
 
-/// Classe qui ecoute les Messages de chaque client
+/// Classe qui ecoute les Messages de chaque client  ou du serveur
 
 public class Listen extends Thread {
 /// Attributs
     Socket client;
-    DataOutputStream output;     // pour l'envoie de donnees
     DataInputStream input;       // pour la reception de donnees
 
 /// Encapsulation
@@ -17,15 +16,10 @@ public class Listen extends Thread {
     public void setInput(DataInputStream input) {this.input = input;}
     public DataInputStream getInput() {return this.input;}
 
-    public void setOutput(DataOutputStream output) {this.output = output;}
-    public DataOutputStream getOutput() {return this.output;}
-
-
 /// Constructeur
     public Listen(Socket client) {
         setClient(client);
         try {
-            setOutput(new DataOutputStream(getClient().getOutputStream()));
             setInput(new DataInputStream(getClient().getInputStream()));
             this.start();
         } catch (Exception e) {

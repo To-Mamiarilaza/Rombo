@@ -1,7 +1,8 @@
 package socket;
 import java.io.*;
 import java.net.*;
-public class Client {
+import ecoute.Listen;
+public class Client extends ConnectionMode {
 /// Attributs   
     Socket socket;
     DataOutputStream output;     // pour l'envoie de donnees
@@ -25,6 +26,7 @@ public class Client {
             System.out.println("Connection effectue !");
             setOutput(new DataOutputStream(getSocket().getOutputStream()));     // prepare le tyau d' envoie
             setInput(new DataInputStream(getSocket().getInputStream()));
+            new Listen(getSocket());
             testMessage();
         } catch(Exception e) {
             System.out.println(e);
