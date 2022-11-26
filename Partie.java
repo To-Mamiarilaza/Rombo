@@ -13,6 +13,7 @@ public class Partie {
 /// Constructeur
     public Partie(Vector<Joueur> listesJoueur) {
         setListesJoueur(listesJoueur);
+        
     }
 
     public Partie() {
