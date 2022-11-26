@@ -11,6 +11,6 @@ public class Main {
         // Fenetre fenetre = new Fenetre();
 
         // Test reseau
-        NetworkManager gerantReseaux = new NetworkManager("serveur");
+        NetworkManager gerantReseaux = new NetworkManager("client");
     }
 }
