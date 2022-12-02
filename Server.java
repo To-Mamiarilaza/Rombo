@@ -64,8 +64,9 @@ public class Server extends ConnectionMode {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             getOutputListes().removeElementAt(indiceSocket);    // On jette
+            getClients().removeElementAt(indiceSocket);
+            e.printStackTrace();
         }
     }
 
