@@ -3,19 +3,26 @@ import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
 import joueur.Joueur;
+import manager.Partie;
+import socket.Client;
 import container.Board;
 
 public class Input implements MouseListener, KeyListener, MouseMotionListener {
 /// Attributs
     Joueur joueur;
+    Client client;
 
 /// Encapsulation
+    public void setClient(Client client) {this.client = client;}
+    public Client getClient() {return this.client;}
+
     public void setJoueur(Joueur joueur) {this.joueur = joueur;}
     public Joueur getJoueur() {return this.joueur;}
 
 /// Constructeur
     public Input(Joueur joueur, Board container) {
         setJoueur(joueur);
+        setClient(container.getJeu().getClient());
         container.addMouseListener(this);
         container.addKeyListener(this);
         container.addMouseMotionListener(this);
@@ -25,7 +32,8 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
 
     /// Fonctions pour le tir
     public void mouseClicked(MouseEvent e) {
-        getJoueur().getFlecheActive().setTir(true);
+        getJoueur().setTir(true);
+        getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
     }
     public void mouseEntered(MouseEvent e) {
 
@@ -98,5 +106,6 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
 
     public void mouseMoved(MouseEvent e) {
         getJoueur().setAngle(findAngle(e.getX(), e.getY()));
+        getJoueur().getJeu().getClient().sendMessage("Angle:" + getJoueur().getNom() + ",angle:" + getJoueur().getAngle());
     }
 }

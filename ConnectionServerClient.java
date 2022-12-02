@@ -22,17 +22,17 @@ public class ConnectionServerClient extends Thread {
     public void listenClient() throws Exception {
         /// Ecoute l'entree des clients
         Socket newSocket = getServeur().getServeur().accept(); 
-        System.out.println("---> Un client entre !");
         getServeur().getClients().add(newSocket);
         getServeur().getOutputListes().add(new DataOutputStream(newSocket.getOutputStream()));
-        new Listen(newSocket);
+        new Listen(newSocket, getServeur());
+        listenClient();
     }
 
     public void run() {
         try {
             listenClient();
         } catch(Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 

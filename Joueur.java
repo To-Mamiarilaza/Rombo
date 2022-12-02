@@ -1,5 +1,7 @@
 package joueur;
 import game.GameObject;
+import manager.Partie;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
@@ -13,7 +15,9 @@ public class Joueur extends GameObject {
     int vitesse;    // Vitesse de deplacement du joueur
     Fleche[] listesFleche;      // les fleches du joueur
     int actif;      // indice du fleche actif
+    boolean tir;
     Color[] couleur;    // indice 0 couleur principale 1 // autre
+    Partie jeu;
 
     /// Pour les key de deplacements
     protected boolean up = false;
@@ -36,11 +40,20 @@ public class Joueur extends GameObject {
     } 
     public Fleche getFlecheActive() {return getListesFleche()[getActif() % 2];}
 
+    public void setJeu(Partie jeu) {this.jeu = jeu;}
+    public Partie getJeu() {return this.jeu;}
+
     public void setCouleur(Color[] couleur) {this.couleur = couleur;}
     public Color[] getCouleur() {return this.couleur;}
 
     public void setNom(String nom) {this.nom = nom;}
     public String getNom() {return this.nom;}
+
+    public void setTir(boolean tir) {
+        if(tir) getFlecheActive().setTir(true);
+        this.tir = tir;
+    }
+    public boolean getTir() {return this.tir;}
 
     public void setPoint(int point) {this.point = point;}
     public int getPoint() {return this.point;}
@@ -52,10 +65,11 @@ public class Joueur extends GameObject {
     public int getVitesse() {return this.vitesse;}
 
 /// Constructeur
-    public Joueur(String nom) {
+    public Joueur(String nom, Partie jeu) {
         setNom(nom);
-        setX(200);
-        setY(200);
+        setX(300);
+        setY(300);
+        setJeu(jeu);
         setAngle(0);
         setVitesse(1);
         setWidth(40);
@@ -70,10 +84,22 @@ public class Joueur extends GameObject {
 
     /// Deplacement du joueur
     public void move() {
-        if (up) setY(getY() - getVitesse());
-        if (down) setY(getY() + getVitesse());
-        if (left) setX(getX() - getVitesse());
-        if (right) setX(getX() + getVitesse());
+        if (up) {
+            setY(getY() - getVitesse());
+            getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
+        }
+        if (down) {
+            setY(getY() + getVitesse());
+            getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
+        } 
+        if (left) {
+            setX(getX() - getVitesse());
+            getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
+        }
+        if (right)  {
+            setX(getX() + getVitesse());
+            getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
+        }
     }
 
     public double generateRandom(double a, double b) {
@@ -137,6 +163,11 @@ public class Joueur extends GameObject {
         g.rotate(Math.toRadians(-1 * getAngle()), getX() + (getWidth() / 2), getY() + (getHeight() / 2));       // inversement pour rendre l'angle a 0
         
         flecheMouvement(graph);
+    }
+
+    public String getEncodage() {
+        String resultat = "Joueur:" + getNom() + ",X:" + getX() + ",Y:" + getY() + ",Angle:" + getAngle() + ",Vitesse:" + getVitesse() + ",Tir:" + getTir();
+        return resultat;
     }
 
     public void detailJoueur() {

@@ -66,6 +66,9 @@ public class Fleche extends GameObject {
         if (!getRechargement() && System.currentTimeMillis() - getDuration() >= 500 && !getProprietaire().getListesFleche()[getProprietaire().getNextIndiceActif()].getTir()) {
             setRechargement(true);
             getProprietaire().changeActifFleche();
+            getProprietaire().setTir(false);
+            getProprietaire().getJeu().getClient().sendMessage("Tir:" + getProprietaire().getNom() + ",tir:false");
+        
         }
 
         // Verifier si la fleche a deja vecu plus de cind seconde
