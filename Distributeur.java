@@ -62,18 +62,23 @@ public class Distributeur {
     }
 
     public void initialisation(String code) throws Exception {
-        // Initialisation:Koto,color1:214-231-75,color2:117-35-28,port:66522
+        // Initialisation:Koto,color1:214-231-75,color2:117-35-28,port:66522,X:300,Y:400
         String[] division = code.split(",");
         Joueur nouveau = new Joueur(division[0].split(":")[1], getJeu());
+        
         if(division[1].equals("Erreur")) {   // Verifie si c'est une reponse d'erreur
             getJeu().stopPartie();
         }
+
+        nouveau.setX(Integer.valueOf(division[4].split(":")[1]));
+        nouveau.setY(Integer.valueOf(division[5].split(":")[1]));
+        nouveau.setAngle(Integer.valueOf(division[6].split(":")[1]));
         nouveau.setCouleur(decodageCouleur(division));
 
         if(!checkDoublon(nouveau)) {        // si il n'y a pas de doublons on procede normallement
             getJeu().getListesJoueur().add(nouveau);
             if(!code.endsWith("Recu")) {
-                code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() + ",port:" + division[3].split(":")[1] + ",Recu";
+                code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() + ",port:" + division[3].split(":")[1] + ",X:" + getJeu().getJoueurPrincipale().getX() + ",Y:" + getJeu().getJoueurPrincipale().getY() + ",Angle:" + getJeu().getJoueurPrincipale().getAngle() + ",Recu";
                 getClient().sendMessage(code);
             }
         }
@@ -91,7 +96,6 @@ public class Distributeur {
         // Angle:To,Angle:45
         // Tir:To,tir:true
 
-        System.out.println("Code : " + code);
         String[] division = code.split(","); 
         Joueur marionette = getJeu().findJoueur(division[0].split(":")[1]);
 
@@ -128,7 +132,7 @@ public class Distributeur {
         if(code.startsWith("Initialisation")) initialisation(code);
         else {
             if (getReady()) {       // Attends que l'initialisation soit faites avant d'executer des code
-                // actionJoueur(code);
+                actionJoueur(code);
             }
         }
     }

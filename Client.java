@@ -49,7 +49,7 @@ public class Client extends ConnectionMode {
             setDistributeur(new Distributeur(this));
 
 
-            sendMessage("Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() +",port:" + getSocket().getLocalPort());
+            sendMessage("Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() +",port:" + getSocket().getLocalPort() + ",X:" + getJeu().getJoueurPrincipale().getX() + ",Y:" + getJeu().getJoueurPrincipale().getY() + ",Angle:" + getJeu().getJoueurPrincipale().getAngle());
 
             setEcouteur(new Listen(getSocket(), this));
             

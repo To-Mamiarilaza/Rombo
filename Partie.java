@@ -36,7 +36,7 @@ public class Partie {
         setBoard(board);
         setListesJoueur(new Vector<Joueur>());
         if(mode.equals("serveur")) new Server();
-        setJoueurPrincipale(new Joueur("Mikalo", this));        // Ajout du joueur principale
+        setJoueurPrincipale(new Joueur("Bitro", this));        // Ajout du joueur principale
         getListesJoueur().add(getJoueurPrincipale());
         joinServer();
     }
