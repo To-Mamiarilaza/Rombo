@@ -20,7 +20,7 @@ public class Board extends JPanel {
 
 /// Constructeur
     public Board(Fenetre container) {
-        setJeu(new Partie("client", this));
+        setJeu(new Partie("serveur", this));
         
         // getJeu().addJoueur("To");
         // getJeu().addJoueur("Niavo");

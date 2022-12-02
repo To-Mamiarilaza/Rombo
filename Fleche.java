@@ -15,7 +15,6 @@ public class Fleche extends GameObject {
     boolean actif = false;          // true si c'est la fleche actif    // La fleche active se trouve a l'indice 0
     boolean tir = false;            // true si une tir est effectue
     boolean demande = false;            // en attends deja que si tu a fini de tirer tu te place au canon
-    boolean rechargement = false;       // true si le joueur a deja fait un chargement // la fleche appel un rechargement
     long duration;          // temps de voyage lorsqu'on tir
 
 /// Encapsulation
@@ -39,9 +38,6 @@ public class Fleche extends GameObject {
     public void setDemande(boolean demande) {this.demande = demande;}
     public boolean getDemande() {return this.demande;}
 
-    public void setRechargement(boolean rechargement) {this.rechargement = rechargement;}
-    public boolean getRechargement() {return this.rechargement;}
-
     public void setActif(boolean actif) {this.actif = actif;}
     public boolean getActif() {return this.actif;}
 
@@ -58,45 +54,41 @@ public class Fleche extends GameObject {
         setVitesse(6);
         setY(getProprietaire().getY());
         setLongueur(35);
+        setDemande(true);
     }
 
 /// Fonctions de classe
     public void checkDuration() {
         // Attends un peu avant de recharger la balle
-        if (!getRechargement() && System.currentTimeMillis() - getDuration() >= 500 && !getProprietaire().getListesFleche()[getProprietaire().getNextIndiceActif()].getTir()) {
-            setRechargement(true);
+        if (getDemande() && System.currentTimeMillis() - getDuration() >= 500) {
+            setDemande(false);      // Pour que ce soit unique
             getProprietaire().changeActifFleche();
             getProprietaire().setTir(false);
             getProprietaire().getJeu().getClient().sendMessage("Tir:" + getProprietaire().getNom() + ",tir:false");
-        
         }
 
         // Verifier si la fleche a deja vecu plus de cind seconde
         if (System.currentTimeMillis() - getDuration() >= 2000) {
             setTir(false);
             setActif(false);
-            setRechargement(false);
-            if (getProprietaire().getListesFleche()[getProprietaire().getNextIndiceActif()].getTir()) {
-                getProprietaire().changeActifFleche();
-            }
+            setDemande(true);
         }
-
     }
 
-    public double[] getCoordDeplacement(double angle) {       
+    public float[] getCoordDeplacement(double angle) {       
         // transforme l'angle en un coordonees de deplacement  
         angle = Math.toRadians(angle);
-        double[] resultat = new double[2];
-        resultat[0] = Math.cos(angle);
-        resultat[1] = Math.sin(angle);
+        float[] resultat = new float[2];
+        resultat[0] = (float) Math.cos(angle);
+        resultat[1] = (float) Math.sin(angle);
         return resultat;
     }
 
     public void feu() {
         /// Appeler lorsque le joueur Tir
-        double[] coord = getCoordDeplacement((double) getAngle());
-        setX((int)((double)getX() + 1 * (double)getVitesse() * coord[0]));
-        setY((int)((double)getY() + 1 * (double)getVitesse() * coord[1]));
+        float[] coord = getCoordDeplacement((double) getAngle());
+        setX(Math.round((float)getX() + 1 * (float)getVitesse() * coord[0]));
+        setY(Math.round((float)getY() + 1 * (float)getVitesse() * coord[1]));
         checkDuration();    
     }
 
@@ -118,10 +110,12 @@ public class Fleche extends GameObject {
                 g.rotate(Math.toRadians(getAngle()), getX(), getY());
                 feu();
             }
+            
             graph.fillOval(getX() + getLongueur(), getY() - getProprietaire().getHeight() / 12, getProprietaire().getWidth() / 4, getProprietaire().getHeight() / 6);    // Le canon
             graph.setColor(Color.red);
             graph.drawLine(getX(), getY(), getX() + getLongueur(), getY());    // Le canon
             g.rotate(Math.toRadians(-1 * getAngle()), getX(), getY());
         }
     }
+
 }

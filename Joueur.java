@@ -38,7 +38,7 @@ public class Joueur extends GameObject {
     public Fleche getFleche(int indice) {
         return getListesFleche()[indice];
     } 
-    public Fleche getFlecheActive() {return getListesFleche()[getActif() % 2];}
+    public Fleche getFlecheActive() {return getListesFleche()[getActif()];}
 
     public void setJeu(Partie jeu) {this.jeu = jeu;}
     public Partie getJeu() {return this.jeu;}
@@ -118,22 +118,15 @@ public class Joueur extends GameObject {
         setCouleur(listesColors);
     }
 
-    public int getNextIndiceActif() {
-        return (getActif() + 1) % 2;
-    }
-
     public void changeActifFleche() {
         // Changer la fleche actif
-        setActif(getActif() + 1);
-        int indice = getActif() % 2;
-        if (!getListesFleche()[indice].getTir()) {
-            getListesFleche()[indice].setActif(true);        // Active le nouveau fleche
-        }
+        setActif((getActif() + 1) % 5);
+        getListesFleche()[getActif()].setActif(true);        // Active le nouveau fleche
     }
 
     public void prepareJoueurFleche() {
         /// Donne du fleche au joueur
-        Fleche[] listes = new Fleche[2];        // Le nombre de fleche donnee
+        Fleche[] listes = new Fleche[5];        // Le nombre de fleche donnee
         for(int i = 0; i < listes.length; i++) {
             listes[i] = new  Fleche(this);
         }
@@ -149,6 +142,7 @@ public class Joueur extends GameObject {
 
     public void selfDraw(Graphics graph) {
         /// Chaque player dessine eux meme
+
         graph.setColor(getCouleur()[0]);       // Couleur principale
         graph.fillOval(getX(), getY(), getWidth(), getHeight());        // Le corp du joueur
         graph.setColor(getCouleur()[1]);
