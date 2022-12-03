@@ -104,18 +104,27 @@ public class Fleche extends GameObject {
             Graphics2D g = (Graphics2D) graph;
             if (!tir) {
                 followJoueur();
-                g.rotate(Math.toRadians(getAngle()), getProprietaire().getX() + (getProprietaire().getWidth() / 2),getProprietaire().getY() + (getProprietaire().getHeight() / 2));
+                // g.rotate(Math.toRadians(getAngle()), getProprietaire().getX() + (getProprietaire().getWidth() / 2),getProprietaire().getY() + (getProprietaire().getHeight() / 2));
             }
             else {
-                g.rotate(Math.toRadians(getAngle()), getX(), getY());
+                // g.rotate(Math.toRadians(getAngle()), getX(), getY());
                 feu();
             }
             
             graph.fillOval(getX() + getLongueur(), getY() - getProprietaire().getHeight() / 12, getProprietaire().getWidth() / 4, getProprietaire().getHeight() / 6);    // Le canon
             graph.setColor(Color.red);
             graph.drawLine(getX(), getY(), getX() + getLongueur(), getY());    // Le canon
-            g.rotate(Math.toRadians(-1 * getAngle()), getX(), getY());
+            // g.rotate(Math.toRadians(-1 * getAngle()), getX(), getY());
         }
     }
+
+    public int[] getRotationPosition(double x, double y, double x0, double y0, double angle) {
+        int resultX =(int)(Math.cos(angle) * (x - x0) - (y - y0) * Math.sin(angle) + x0);
+        int resultY = (int)(Math.cos(angle) * (y - y0) + (x - x0) * Math.sin(angle) + y0);
+        int[] resultat = new int[2];
+        resultat[0] = resultX;
+        resultat[1] = resultY;
+        return resultat;
+    }   
 
 }

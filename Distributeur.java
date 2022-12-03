@@ -63,7 +63,6 @@ public class Distributeur {
 
     public void initialisation(String code) throws Exception {
         // Initialisation:Koto,color1:214-231-75,color2:117-35-28,port:66522,X:300,Y:400
-        System.out.println("Recu : " + code);
         String[] division = code.split(",");
         Joueur nouveau = new Joueur(division[0].split(":")[1], getJeu());
         
@@ -128,7 +127,7 @@ public class Distributeur {
         if(code.startsWith("Initialisation")) initialisation(code);
         else {
             if (getReady()) {       // Attends que l'initialisation soit faites avant d'executer des code
-                // actionJoueur(code);
+                actionJoueur(code);
             }
         }
     }
