@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.util.Vector;
 import joueur.Joueur;
 
 public class Fleche extends GameObject {
@@ -15,9 +16,17 @@ public class Fleche extends GameObject {
     boolean actif = false;          // true si c'est la fleche actif    // La fleche active se trouve a l'indice 0
     boolean tir = false;            // true si une tir est effectue
     boolean demande = false;            // en attends deja que si tu a fini de tirer tu te place au canon
+    boolean touche = false;         // true if touche adversaire
     long duration;          // temps de voyage lorsqu'on tir
+    int[] balle;
 
 /// Encapsulation
+    public void setTouche(boolean touche) {this.touche = touche;}
+    public boolean getTouche() {return this.touche;}
+
+    public void setBalle(int[] balle) {this.balle = balle;}
+    public int[] getBalle() {return this.balle;}
+
     public void setDuration(long duration) {this.duration = duration;}
     public long getDuration() {return this.duration;}
 
@@ -58,6 +67,18 @@ public class Fleche extends GameObject {
     }
 
 /// Fonctions de classe
+    public void checkCollision() {
+        Vector<Joueur> listesJoueur = getProprietaire().getJeu().getListesJoueur();
+        for(int i = 0; i < listesJoueur.size(); i++) {
+            Joueur j = listesJoueur.elementAt(i);
+            if(getBalle()[0] > j.getX() && getBalle()[0] < j.getX() + j.getWidth() && getBalle()[1] > j.getY() && getBalle()[1] < j.getY() + j.getHeight()) {
+                System.out.println("Il y a un collision");
+                j.startCollision();
+                setTouche(true);
+            }
+        }
+    }
+
     public void checkDuration() {
         // Attends un peu avant de recharger la balle
         if (getDemande() && System.currentTimeMillis() - getDuration() >= 500) {
@@ -72,6 +93,7 @@ public class Fleche extends GameObject {
             setTir(false);
             setActif(false);
             setDemande(true);
+            setTouche(false);
         }
     }
 
@@ -86,9 +108,12 @@ public class Fleche extends GameObject {
 
     public void feu() {
         /// Appeler lorsque le joueur Tir
-        float[] coord = getCoordDeplacement((double) getAngle());
-        setX(Math.round((float)getX() + 1 * (float)getVitesse() * coord[0]));
-        setY(Math.round((float)getY() + 1 * (float)getVitesse() * coord[1]));
+        if(!getTouche()) {      // si il touche une adversaire il arrete de bouger
+            float[] coord = getCoordDeplacement((double) getAngle());
+            setX(Math.round((float)getX() + 1 * (float)getVitesse() * coord[0]));
+            setY(Math.round((float)getY() + 1 * (float)getVitesse() * coord[1]));
+            checkCollision();
+        }
         checkDuration();    
     }
 
@@ -104,23 +129,26 @@ public class Fleche extends GameObject {
             Graphics2D g = (Graphics2D) graph;
             if (!tir) {
                 followJoueur();
-                // g.rotate(Math.toRadians(getAngle()), getProprietaire().getX() + (getProprietaire().getWidth() / 2),getProprietaire().getY() + (getProprietaire().getHeight() / 2));
+                g.rotate(Math.toRadians(getAngle()), getProprietaire().getX() + (getProprietaire().getWidth() / 2),getProprietaire().getY() + (getProprietaire().getHeight() / 2));
+                setBalle(getRotationPosition((double)getX() + getLongueur() + getProprietaire().getWidth() / 4, (double)getY(), (double)(getProprietaire().getX() + getProprietaire().getWidth() / 2), (double)(getProprietaire().getY() + getProprietaire().getHeight() / 2), Math.toRadians(getAngle())));     // Coordonees de collision
             }
             else {
-                // g.rotate(Math.toRadians(getAngle()), getX(), getY());
+                g.rotate(Math.toRadians(getAngle()), getX(), getY());
                 feu();
+                setBalle(getRotationPosition((double)getX() + getLongueur() + getProprietaire().getWidth() / 4, (double)getY(), (double)(getX() - + (getProprietaire().getWidth() / 4)), (double)getY(), Math.toRadians(getAngle())));
             }
-            
-            graph.fillOval(getX() + getLongueur(), getY() - getProprietaire().getHeight() / 12, getProprietaire().getWidth() / 4, getProprietaire().getHeight() / 6);    // Le canon
-            graph.setColor(Color.red);
-            graph.drawLine(getX(), getY(), getX() + getLongueur(), getY());    // Le canon
-            // g.rotate(Math.toRadians(-1 * getAngle()), getX(), getY());
+            if(!getTouche()) {      // lorsque le fleche touche un joueur il disparait
+                graph.fillOval(getX() + getLongueur(), getY() - getProprietaire().getHeight() / 12, getProprietaire().getWidth() / 4, getProprietaire().getHeight() / 6);    // La tete
+                graph.setColor(Color.red);
+                graph.drawLine(getX(), getY(), getX() + getLongueur(), getY());    // Le canon
+            }
+            g.rotate(Math.toRadians(-1 * getAngle()), getX(), getY());
         }
     }
 
     public int[] getRotationPosition(double x, double y, double x0, double y0, double angle) {
-        int resultX =(int)(Math.cos(angle) * (x - x0) - (y - y0) * Math.sin(angle) + x0);
-        int resultY = (int)(Math.cos(angle) * (y - y0) + (x - x0) * Math.sin(angle) + y0);
+        int resultX = Math.round((float)(Math.cos(angle) * (x - x0) - (y - y0) * Math.sin(angle) + x0));
+        int resultY = Math.round((float)(Math.cos(angle) * (y - y0) + (x - x0) * Math.sin(angle) + y0));
         int[] resultat = new int[2];
         resultat[0] = resultX;
         resultat[1] = resultY;

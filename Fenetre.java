@@ -19,5 +19,6 @@ public class Fenetre extends JFrame {
         setVisible(true);
         setBounds(100, 100, 700, 700);
         add(new Board(this));
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 }

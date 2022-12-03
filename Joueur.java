@@ -17,6 +17,7 @@ public class Joueur extends GameObject {
     int actif;      // indice du fleche actif
     boolean tir;
     Color[] couleur;    // indice 0 couleur principale 1 // autre
+    CollisionAnimation collideAnimate;
     Partie jeu;
 
     /// Pour les key de deplacements
@@ -39,6 +40,9 @@ public class Joueur extends GameObject {
         return getListesFleche()[indice];
     } 
     public Fleche getFlecheActive() {return getListesFleche()[getActif()];}
+
+    public void setCollideAnimate(CollisionAnimation collideAnimate) {this.collideAnimate = collideAnimate;}
+    public CollisionAnimation getCollideAnimate() {return this.collideAnimate;}
 
     public void setJeu(Partie jeu) {this.jeu = jeu;}
     public Partie getJeu() {return this.jeu;}
@@ -78,6 +82,7 @@ public class Joueur extends GameObject {
         setActif(0);
         prepareCouleur();
         prepareJoueurFleche();
+        setCollideAnimate(new CollisionAnimation(this));
     }
 
 /// Fonctions de classe
@@ -100,6 +105,10 @@ public class Joueur extends GameObject {
             setX(getX() + getVitesse());
             getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
         }
+    }
+
+    public void startCollision() {
+        getCollideAnimate().start();
     }
 
     public double generateRandom(double a, double b) {
