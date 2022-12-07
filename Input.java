@@ -32,8 +32,11 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
 
     /// Fonctions pour le tir
     public void mouseClicked(MouseEvent e) {
-        getJoueur().setTir(true);
-        getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+        if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
+        if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
+            getJoueur().setTir(true);
+            getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+        }
     }
     public void mouseEntered(MouseEvent e) {
 
@@ -50,17 +53,31 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
 
     /// Fonctions de deplacements
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
-            getJoueur().setUp(true);
-        }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            getJoueur().setDown(true);
-        }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            getJoueur().setRight(true);
-        }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            getJoueur().setLeft(true);
+        if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
+        if(getJoueur().getDebutCollision() == 0) {
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                getJoueur().setUp(true);
+            }
+            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                getJoueur().setDown(true);
+            }
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                getJoueur().setRight(true);
+            }
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                getJoueur().setLeft(true);
+            }
+            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                if (getJoueur().getCanEsquive()) {
+                    getJoueur().setEsquive(true);
+                }
+            }
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
+                    getJoueur().setTir(true);
+                    getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+                }
+            }
         }
     }
 
@@ -105,7 +122,10 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
     }
 
     public void mouseMoved(MouseEvent e) {
-        getJoueur().setAngle(findAngle(e.getX(), e.getY()));
-        getJoueur().getJeu().getClient().sendMessage("Angle:" + getJoueur().getNom() + ",angle:" + getJoueur().getAngle());
+        if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
+        if(getJoueur().getDebutCollision() == 0) {
+            getJoueur().setAngle(findAngle(e.getX(), e.getY()));
+            getJoueur().getJeu().getClient().sendMessage("Angle:" + getJoueur().getNom() + ",angle:" + getJoueur().getAngle());
+        }
     }
 }

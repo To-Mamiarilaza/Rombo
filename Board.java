@@ -19,17 +19,24 @@ public class Board extends JPanel {
     public Partie getJeu() {return this.jeu;}
 
 /// Constructeur
-    public Board(Fenetre container) {
-        setJeu(new Partie("serveur", this));
+    public Board(Fenetre container, Partie jeu) {
+        setJeu(jeu);
         
         // getJeu().addJoueur("To");
         // getJeu().addJoueur("Niavo");
 
         setContainer(container);
+        container.add(this);
         initGameBoard();
     }
 
 // / Fonction de classe
+    public void drawAllWall(Graphics graph) {
+        for(int i = 0; i < getJeu().getListesMur().size(); i++) {
+            getJeu().getListesMur().elementAt(i).selfDraw(graph);
+        }
+    }
+
     public void drawAllPlayer(Graphics graph) {
         /// Dessine chaque joueur
         Graphics2D g = (Graphics2D) graph;
@@ -39,12 +46,21 @@ public class Board extends JPanel {
             getJeu().getListesJoueur().elementAt(i).move();             /// met en mouvement chaque joueur
             g.setTransform(oldXForm);
         }
+        for(int i = 0; i < getJeu().getListesJoueur().size(); i++) {
+            if (getJeu().getListesJoueur().elementAt(i).getDead()) getJeu().removeJoueur(getJeu().getListesJoueur().elementAt(i));
+        }
     }
 
     public void paintComponent(Graphics graph) {
         /// Fonction de dessin principale
         super.paintComponent(graph);
         drawAllPlayer(graph);
+        drawAllWall(graph);
+        try {
+            Thread.sleep(2);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         repaint();
     }
 

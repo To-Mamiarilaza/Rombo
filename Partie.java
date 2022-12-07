@@ -2,6 +2,8 @@ package manager;
 import java.util.Vector;
 import joueur.Joueur;
 import container.Board;
+import container.Fenetre;
+import mur.Mur;
 import java.awt.Color;
 import listener.*;
 import socket.*;
@@ -9,11 +11,19 @@ import socket.*;
 public class Partie {
 /// Attributs
     Vector<Joueur> listesJoueur;
+    Vector<Mur> listesMur;
     Joueur principale;
+    Fenetre container;
     Board board;
     Client client;      // Interface pour l'interconnection
 
 /// Encapsulation
+    public void setContainer(Fenetre container) {this.container = container;}
+    public Fenetre getContainer() {return this.container;}
+
+    public void setListesMur(Vector<Mur> listesMur) {this.listesMur = listesMur;}
+    public Vector<Mur> getListesMur() {return this.listesMur;}
+
     public void setClient(Client client) {this.client = client;}
     public Client getClient() {return this.client;}
 
@@ -32,19 +42,39 @@ public class Partie {
 
     }
 
-    public Partie(String mode, Board board) {
-        setBoard(board);
+    public Partie(String mode, String joueurName, Fenetre container) {
+        setListesMur(new Vector<Mur>());
         setListesJoueur(new Vector<Joueur>());
+        placeAllWall();
         if(mode.equals("serveur")) new Server();
-        setJoueurPrincipale(new Joueur("Niavo", this));        // Ajout du joueur principale
+        setJoueurPrincipale(new Joueur(joueurName, this));        // Ajout du joueur principale
         getListesJoueur().add(getJoueurPrincipale());
         joinServer();
 
+        setBoard(new Board(container, this));
+
         // Conception du jeu
-        getListesJoueur().add(new Joueur("To", this));
+        // getListesJoueur().add(new Joueur("To", this));
     }
 
 /// Fonction de classe
+    public void placeAllWall() {
+        // Place tous les mur
+        getListesMur().add(new Mur(200, 150, 30));
+        getListesMur().add(new Mur(423, 500, 70));
+        getListesMur().add(new Mur(76, 50, 40));
+        getListesMur().add(new Mur(80, 250, 30));
+        getListesMur().add(new Mur(500, 245, 50));
+        getListesMur().add(new Mur(1000, 20, 50));
+        getListesMur().add(new Mur(1000, 750, 70));
+        getListesMur().add(new Mur(850, 400, 60));
+        getListesMur().add(new Mur(200, 580, 50));
+        getListesMur().add(new Mur(800, 700, 20));
+        getListesMur().add(new Mur(1300, 400, 70));
+        getListesMur().add(new Mur(1200, 650, 45));
+        getListesMur().add(new Mur(1200, 650, 45));
+    }
+
     public Joueur findJoueur(String nom) throws Exception {
         for(int i = 0; i < getListesJoueur().size(); i++) {
             if (getListesJoueur().elementAt(i).getNom().equals(nom)) {
@@ -52,6 +82,15 @@ public class Partie {
             }
         }
         throw new Exception("Ce joueur : " + nom + " n'existe pas !");
+    }
+
+    public void removeJoueur(Joueur joueur) {
+        for(int i = 0; i < getListesJoueur().size(); i++) {
+            if (getListesJoueur().elementAt(i).getNom().equals(joueur.getNom())) {
+                getListesJoueur().removeElementAt(i);
+                return;
+            }
+        }
     }
 
     public String prepareColorCode() {

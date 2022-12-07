@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import mur.Mur;
 import java.util.Vector;
 import joueur.Joueur;
 
@@ -60,20 +61,30 @@ public class Fleche extends GameObject {
     public Fleche(Joueur proprietaire) {
         setProprietaire(proprietaire);
         setX(getProprietaire().getX());
-        setVitesse(6);
+        setVitesse(7);
         setY(getProprietaire().getY());
         setLongueur(35);
         setDemande(true);
     }
 
 /// Fonctions de classe
+    public void checkWallCollision() {
+        // Verifie les collision avec les mur
+        Vector<Mur> listesMur = getProprietaire().getJeu().getListesMur();
+        for(int i = 0; i < listesMur.size(); i++) {
+            Mur m = listesMur.elementAt(i);
+            if(getBalle()[0] > m.getX() && getBalle()[0] < m.getX() + m.getWidth() && getBalle()[1] > m.getY() && getBalle()[1] < m.getY() + m.getHeight()) setTouche(true);
+        }
+    }
+
     public void checkCollision() {
         Vector<Joueur> listesJoueur = getProprietaire().getJeu().getListesJoueur();
         for(int i = 0; i < listesJoueur.size(); i++) {
             Joueur j = listesJoueur.elementAt(i);
             if(getBalle()[0] > j.getX() && getBalle()[0] < j.getX() + j.getWidth() && getBalle()[1] > j.getY() && getBalle()[1] < j.getY() + j.getHeight()) {
-                System.out.println("Il y a un collision");
-                j.startCollision();
+                getProprietaire().setPoint(getProprietaire().getPoint() + 1);
+                j.setVie(j.getVie() - 1);
+                j.startCollision(this);
                 setTouche(true);
             }
         }
@@ -113,6 +124,7 @@ public class Fleche extends GameObject {
             setX(Math.round((float)getX() + 1 * (float)getVitesse() * coord[0]));
             setY(Math.round((float)getY() + 1 * (float)getVitesse() * coord[1]));
             checkCollision();
+            checkWallCollision();
         }
         checkDuration();    
     }

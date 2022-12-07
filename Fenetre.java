@@ -17,8 +17,8 @@ public class Fenetre extends JFrame {
     public void initUI() {
         /// Initialiser l'interface graphique
         setVisible(true);
-        setBounds(100, 100, 700, 700);
-        add(new Board(this));
+        setBounds(100, 50, 800, 800);       // width : 1400 height : 800
+        new Partie("serveur", "To", this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 }

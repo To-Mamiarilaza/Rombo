@@ -1,9 +1,11 @@
 package joueur;
 import game.GameObject;
 import manager.Partie;
+import mur.Mur;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.Vector;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import weapon.Fleche;
@@ -16,15 +18,21 @@ public class Joueur extends GameObject {
     Fleche[] listesFleche;      // les fleches du joueur
     int actif;      // indice du fleche actif
     boolean tir;
+    long debutCollision; // temps de debut collision
+    long debutEsquive;      // temps de debut esquive
     Color[] couleur;    // indice 0 couleur principale 1 // autre
-    CollisionAnimation collideAnimate;
     Partie jeu;
+    Fleche tireur;  // le bal qui m'a touche
+    int vie;
+    boolean dead;
+    boolean canEsquive;     // true si on a le droit d'esquiver
 
     /// Pour les key de deplacements
     protected boolean up = false;
     protected boolean down = false;
     protected boolean left = false;
     protected boolean right = false;
+    protected boolean esquive = false;
 
 /// Encapsulation
 
@@ -33,6 +41,13 @@ public class Joueur extends GameObject {
     public void setDown(boolean value) {this.down = value;}
     public void setLeft(boolean value) {this.left = value;}
     public void setRight(boolean value) {this.right = value;}
+    public void setEsquive(boolean value) {
+        if (value) {
+            setCanEsquive(false);
+            setDebutEsquive(System.currentTimeMillis());
+        }
+        this.esquive = value;
+    }
 
     public void setListesFleche(Fleche[] listesFleche) {this.listesFleche = listesFleche;}
     public Fleche[] getListesFleche() {return this.listesFleche;}
@@ -41,8 +56,11 @@ public class Joueur extends GameObject {
     } 
     public Fleche getFlecheActive() {return getListesFleche()[getActif()];}
 
-    public void setCollideAnimate(CollisionAnimation collideAnimate) {this.collideAnimate = collideAnimate;}
-    public CollisionAnimation getCollideAnimate() {return this.collideAnimate;}
+    public void setDebutEsquive(long debutEsquive) {this.debutEsquive = debutEsquive;}
+    public long getDebutEsquive() {return this.debutEsquive;}
+
+    public void setDebutCollision(long debutCollision) {this.debutCollision = debutCollision;}
+    public long getDebutCollision() {return this.debutCollision;}
 
     public void setJeu(Partie jeu) {this.jeu = jeu;}
     public Partie getJeu() {return this.jeu;}
@@ -59,6 +77,9 @@ public class Joueur extends GameObject {
     }
     public boolean getTir() {return this.tir;}
 
+    public void setTireur(Fleche tireur) {this.tireur = tireur;}
+    public Fleche getTireur() {return this.tireur;}
+
     public void setPoint(int point) {this.point = point;}
     public int getPoint() {return this.point;}
 
@@ -68,9 +89,19 @@ public class Joueur extends GameObject {
     public void setVitesse(int vitesse) {this.vitesse = vitesse;}
     public int getVitesse() {return this.vitesse;}
 
+    public void setVie(int vie) {this.vie = vie;}
+    public int getVie() {return this.vie;}
+
+    public void setDead(boolean dead) {this.dead = dead;}
+    public boolean getDead() {return this.dead;}
+
+    public void setCanEsquive(boolean canEsquive) {this.canEsquive = canEsquive;}
+    public boolean getCanEsquive() {return this.canEsquive;}
+
 /// Constructeur
     public Joueur(String nom, Partie jeu) {
         setNom(nom);
+        // setInitialPosition();
         setX(300);
         setY(300);
         setJeu(jeu);
@@ -80,9 +111,11 @@ public class Joueur extends GameObject {
         setHeight(40);
         setPoint(0);
         setActif(0);
+        setVie(3);
+        setDead(false);
+        setCanEsquive(true);
         prepareCouleur();
         prepareJoueurFleche();
-        setCollideAnimate(new CollisionAnimation(this));
     }
 
 /// Fonctions de classe
@@ -90,25 +123,99 @@ public class Joueur extends GameObject {
     /// Deplacement du joueur
     public void move() {
         if (up) {
-            setY(getY() - getVitesse());
+            if(checkUpMove(getY() - getVitesse())) setY(getY() - getVitesse());
             getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
         }
         if (down) {
-            setY(getY() + getVitesse());
+            if(checkDownMove(getY() + getVitesse())) setY(getY() + getVitesse());
             getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
         } 
         if (left) {
-            setX(getX() - getVitesse());
+            if(checkLeftMove(getX() - getVitesse())) setX(getX() - getVitesse());
             getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
         }
         if (right)  {
-            setX(getX() + getVitesse());
+            if(checkRightMove(getX() + getVitesse())) setX(getX() + getVitesse());
             getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
         }
     }
 
-    public void startCollision() {
-        getCollideAnimate().start();
+    // public void setInitialPosition() {
+    //     // Trouver une place libre pour placer le joueur
+    //     while(!isFree()) {
+    //         setX(generateRandom(0, getJeu().getContainer().getWidth()));
+    //         setY(generateRandom(0, getJeu().getContainer().getHeight()));
+    //     }
+    // }
+
+    /// Verification des deplacement possible
+    public boolean checkUpMove(int ypos) {
+        Vector<Mur> listesMur = getJeu().getListesMur();
+        for(int i = 0; i < listesMur.size(); i++) {
+            Mur m = listesMur.elementAt(i);
+            if((getX() <= m.getX() + m.getWidth() && getX() >= m.getX()) || (getX() + getWidth() <= m.getX() + m.getWidth() && getX() + getWidth() >= m.getX())) {
+                if (ypos >= m.getY() + m.getHeight() - 10 && ypos <= m.getY() + m.getHeight()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean checkDownMove(int ypos) {
+        Vector<Mur> listesMur = getJeu().getListesMur();
+        for(int i = 0; i < listesMur.size(); i++) {
+            Mur m = listesMur.elementAt(i);
+            if((getX() <= m.getX() + m.getWidth() && getX() >= m.getX()) || (getX() + getWidth() <= m.getX() + m.getWidth() && getX() + getWidth() >= m.getX())) {
+                if (ypos + getHeight() >= m.getY() && ypos + getHeight() <= m.getY() + 10) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean checkLeftMove(int xpos) {
+        Vector<Mur> listesMur = getJeu().getListesMur();
+        for(int i = 0; i < listesMur.size(); i++) {
+            Mur m = listesMur.elementAt(i);
+            if((getY() >= m.getY() && getY() <= m.getY() + m.getHeight()) || (getY() + getHeight() >= m.getY() && getY() + getHeight() <= m.getY() + m.getHeight())) {
+                if (xpos >= m.getX() + getWidth() && xpos <= m.getX() + getWidth() + 10) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean checkRightMove(int xpos) {
+        Vector<Mur> listesMur = getJeu().getListesMur();
+        for(int i = 0; i < listesMur.size(); i++) {
+            Mur m = listesMur.elementAt(i);
+            if((getY() >= m.getY() && getY() <= m.getY() + m.getHeight()) || (getY() + getHeight() >= m.getY() && getY() + getHeight() <= m.getY() + m.getHeight())) {
+                if (xpos + getWidth() >= m.getX() && xpos + getWidth() <= m.getX() + 5) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void processEsquive() {
+        if (System.currentTimeMillis() - getDebutEsquive() < 200) setVitesse(5);
+        else setVitesse(1);
+
+        // fin
+        if (System.currentTimeMillis() - getDebutEsquive() > 1000) {
+            setEsquive(false);
+            setCanEsquive(true);
+        }
+    }
+
+    public void startCollision(Fleche tireur) {
+        setDebutCollision(System.currentTimeMillis());
+        System.out.println("Ma vie est : " + getVie());
+        setTireur(tireur);
     }
 
     public double generateRandom(double a, double b) {
@@ -149,8 +256,33 @@ public class Joueur extends GameObject {
         }
     }
 
+    public void checkRotation() {
+        if (getDebutCollision() != 0) {
+            // Repoussement
+            float[] coord = getTireur().getCoordDeplacement((double) getTireur().getAngle());
+            setX(Math.round((float)getX() + 1 * (float)getVitesse() * coord[0]));
+            setY(Math.round((float)getY() + 1 * (float)getVitesse() * coord[1]));
+            
+            int add = 3;   // vitesse de rotation
+            if(System.currentTimeMillis() - getDebutCollision() > 700) add = 1;
+            setAngle(getAngle() + add);
+            if (System.currentTimeMillis() - getDebutCollision() >= 1000) {
+                setDebutCollision(0);
+            }
+        }
+        else {
+            checkLife();
+        }
+    }
+
+    public void checkLife() {
+        if (getVie() <= 0) setDead(true);
+    }
+
     public void selfDraw(Graphics graph) {
         /// Chaque player dessine eux meme
+        if (esquive) processEsquive();
+        checkRotation();        
 
         graph.setColor(getCouleur()[0]);       // Couleur principale
         graph.fillOval(getX(), getY(), getWidth(), getHeight());        // Le corp du joueur
