@@ -3,12 +3,15 @@ import ecoute.Listen;
 import java.io.*;
 import java.net.*;
 import java.util.Vector;
+import manager.Partie;
 
 public class Server extends ConnectionMode {
 /// Attributs
     ServerSocket serveur;
     Vector<Socket> clients;
     Vector<DataOutputStream> outputListes;     // pour l'envoie de donnees
+    Partie partie;
+    ConnectionServerClient clientLogin;
 
 /// Encapsulation
     public void setOutputListes(Vector<DataOutputStream> outputListes) {this.outputListes = outputListes;}
@@ -20,20 +23,34 @@ public class Server extends ConnectionMode {
     public void setServeur(ServerSocket serveur) {this.serveur = serveur;}
     public ServerSocket getServeur() {return this.serveur;}
 
+    public void setPartie(Partie partie) {this.partie = partie;}
+    public Partie getPartie() {return this.partie;}
+
+    public void setClientLogin(ConnectionServerClient clientLogin) {this.clientLogin = clientLogin;}
+    public ConnectionServerClient getClientLogin() {return this.clientLogin;}
+
 /// Constructeur
-    public Server() {
+    public Server(Partie partie) throws Exception {
         try {
+            setPartie(partie);
             setServeur(new ServerSocket(6666));
             setClients(new Vector<Socket>());
             setOutputListes(new Vector<DataOutputStream>());
-            new ConnectionServerClient(this);       // Ecoute tous les Client qui entre en permanant
+            setClientLogin(new ConnectionServerClient(this));       // Ecoute tous les Client qui entre en permanant
             // testMessage();
         } catch(Exception e) {
-            e.printStackTrace();
+            throw new Exception("Quelqu'un creer deja le partie !");
+            // getPartie().getContainer().goToInput("Quelqu'un creer deja le partie !");
+            
         }
     }
 
 /// Fonction de classes
+    public void fermerServeur() throws Exception {
+        getClientLogin().fermerEcoute();
+        getServeur().close();
+    }
+
     public void findDestination(String message) throws Exception {
         String[] division = message.split(",");
         int port = Integer.valueOf(division[3].split(":")[1]);      // en fonction du place du socket 
@@ -78,6 +95,17 @@ public class Server extends ConnectionMode {
                 sendMessage(reader.readLine(), null);
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void fermerSocket(Socket socket) {
+        try {
+            socket.getOutputStream().close();
+            socket.getInputStream().close();
+            socket.close();
+        } catch (Exception e) {
+            // TODO: handle exception
             e.printStackTrace();
         }
     }

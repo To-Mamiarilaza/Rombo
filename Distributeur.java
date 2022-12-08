@@ -53,7 +53,9 @@ public class Distributeur {
 
     public boolean checkDoublon(Joueur nouveau) {
         //Empeche les joueurs de meme nom
+        System.out.println("Nombre de joueur : " + getJeu().getListesJoueur().size());
         for(int i = 0; i < getJeu().getListesJoueur().size(); i++) {
+            System.out.println("--> " + getJeu().getListesJoueur().elementAt(i).getNom());
             if (getJeu().getListesJoueur().elementAt(i).getNom().equals(nouveau.getNom())) {
                 return true;
             }
@@ -67,7 +69,11 @@ public class Distributeur {
         Joueur nouveau = new Joueur(division[0].split(":")[1], getJeu());
         
         if(division[1].equals("Erreur")) {   // Verifie si c'est une reponse d'erreur
-            getJeu().stopPartie();
+            getJeu().setValider(false);
+            getJeu().getContainer().goToInput("Le nom doit etre unique !");
+            throw new Exception("Le nom doit etre unique !");
+        } else {
+            getJeu().setValider(true);
         }
 
         nouveau.setX(Integer.valueOf(division[4].split(":")[1]));
@@ -84,7 +90,6 @@ public class Distributeur {
         }
         else {
             code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + ",Erreur,Erreur" + ",port:" + division[3].split(":")[1] + ",Recu";
-            System.out.println("Envoie : " + code);
             getClient().sendMessage(code);
         }
     }
@@ -96,10 +101,14 @@ public class Distributeur {
         // MouvementY:To,Y:200
         // Angle:To,Angle:45
         // Tir:To,tir:true
+        // Quitter:Niavo
 
         String[] division = code.split(","); 
         Joueur marionette = getJeu().findJoueur(division[0].split(":")[1]);
 
+        if (marionette == null) return;     // si il y a des poussieres
+
+        System.out.println("Code : " + division[0].split(":")[0]);
         switch (division[0].split(":")[0]) {
             case "MouvementX":
                 marionette.setX(Integer.valueOf(division[1].split(":")[1])); 
@@ -116,6 +125,14 @@ public class Distributeur {
             case "Tir":
                 marionette.setTir(Boolean.valueOf(division[1].split(":")[1])); 
                 break;
+            
+            case "Quitter":
+                getJeu().removeJoueur(getJeu().findJoueur(division[0].split(":")[1]));
+                break;
+
+            // case "ServerQuit":
+            //     getJeu().quitter();
+            //     break;
 
             default:
                 break;

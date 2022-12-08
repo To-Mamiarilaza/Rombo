@@ -72,6 +72,12 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
                     getJoueur().setEsquive(true);
                 }
             }
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                int answer = JOptionPane.showConfirmDialog(getJoueur().getJeu().getContainer(), "Voulez vous vraiment quitter ?");
+                if (answer == JOptionPane.YES_OPTION) {
+                    getJoueur().getJeu().quitter();
+                }
+            }
             if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                 if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
                     getJoueur().setTir(true);

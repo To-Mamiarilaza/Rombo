@@ -1,10 +1,13 @@
 package container;
-import manager.Partie;
+import manager.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.net.InetAddress;
+
 import weapon.Fleche;
 import javax.swing.*;
 import listener.*;
+import socket.Server;
 
 public class Board extends JPanel {
 /// Attributs
@@ -28,6 +31,9 @@ public class Board extends JPanel {
         setContainer(container);
         container.add(this);
         initGameBoard();
+        
+        new GameLoop(this);
+        getContainer().refresh();
     }
 
 // / Fonction de classe
@@ -45,6 +51,9 @@ public class Board extends JPanel {
             getJeu().getListesJoueur().elementAt(i).selfDraw(graph);        // auto dessine ainsi que toutes ces composant
             getJeu().getListesJoueur().elementAt(i).move();             /// met en mouvement chaque joueur
             g.setTransform(oldXForm);
+            getJeu().getJoueurPrincipale().drawPointDeVie(graph);             /// dessine les points de vie
+            getJeu().getJoueurPrincipale().drawScore(graph);          /// dessine les points de vie
+            getJeu().getJoueurPrincipale().drawEsquiveMark(graph);          /// dessine la marque d'esquive
         }
         for(int i = 0; i < getJeu().getListesJoueur().size(); i++) {
             if (getJeu().getListesJoueur().elementAt(i).getDead()) getJeu().removeJoueur(getJeu().getListesJoueur().elementAt(i));
@@ -56,12 +65,6 @@ public class Board extends JPanel {
         super.paintComponent(graph);
         drawAllPlayer(graph);
         drawAllWall(graph);
-        try {
-            Thread.sleep(2);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        repaint();
     }
 
     public void initGameBoard() {
@@ -70,6 +73,20 @@ public class Board extends JPanel {
         setFocusable(true);
         requestFocus();
         setLayout(null);
+        getContainer().setResizable(false);
         setBackground(new Color(242, 223, 161));
+
+        if(getJeu().getContainer().getMode().equals("serveur")) {
+            JLabel adresse = new JLabel();
+            try {
+                adresse.setText("Mon IP : " + InetAddress.getLocalHost().getHostAddress());
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            adresse.setBounds(20, 5, 200, 10);
+            adresse.setFont(new Font(Font.SERIF, Font.PLAIN, 12));
+            adresse.setForeground(Color.BLUE);
+            this.add(adresse);
+        }
     }
 }

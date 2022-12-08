@@ -8,6 +8,8 @@ import java.awt.Graphics2D;
 import java.util.Vector;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+
 import weapon.Fleche;
 
 public class Joueur extends GameObject {
@@ -102,16 +104,16 @@ public class Joueur extends GameObject {
     public Joueur(String nom, Partie jeu) {
         setNom(nom);
         // setInitialPosition();
+        setJeu(jeu);
         setX(300);
         setY(300);
-        setJeu(jeu);
         setAngle(0);
         setVitesse(1);
-        setWidth(40);
-        setHeight(40);
+        setWidth(30);
+        setHeight(30);
         setPoint(0);
         setActif(0);
-        setVie(3);
+        setVie(5);
         setDead(false);
         setCanEsquive(true);
         prepareCouleur();
@@ -119,94 +121,56 @@ public class Joueur extends GameObject {
     }
 
 /// Fonctions de classe
+    // redefinie le setPosition du classe mere
+    @Override
+    public void setX(int x) {
+        if (isFree(x, getY())) super.setX(x); 
+    }
+    @Override
+    public void setY(int y) {
+        if (isFree(getX(), y)) super.setY(y); 
+    }
 
     /// Deplacement du joueur
     public void move() {
         if (up) {
-            if(checkUpMove(getY() - getVitesse())) setY(getY() - getVitesse());
+            setY(getY() - getVitesse());
             getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
         }
         if (down) {
-            if(checkDownMove(getY() + getVitesse())) setY(getY() + getVitesse());
+            setY(getY() + getVitesse());
             getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
         } 
         if (left) {
-            if(checkLeftMove(getX() - getVitesse())) setX(getX() - getVitesse());
+            setX(getX() - getVitesse());
             getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
         }
         if (right)  {
-            if(checkRightMove(getX() + getVitesse())) setX(getX() + getVitesse());
+            setX(getX() + getVitesse());
             getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
         }
     }
 
-    // public void setInitialPosition() {
-    //     // Trouver une place libre pour placer le joueur
-    //     while(!isFree()) {
-    //         setX(generateRandom(0, getJeu().getContainer().getWidth()));
-    //         setY(generateRandom(0, getJeu().getContainer().getHeight()));
-    //     }
-    // }
-
     /// Verification des deplacement possible
-    public boolean checkUpMove(int ypos) {
+    public boolean isFree(int x, int y) {
         Vector<Mur> listesMur = getJeu().getListesMur();
         for(int i = 0; i < listesMur.size(); i++) {
             Mur m = listesMur.elementAt(i);
-            if((getX() <= m.getX() + m.getWidth() && getX() >= m.getX()) || (getX() + getWidth() <= m.getX() + m.getWidth() && getX() + getWidth() >= m.getX())) {
-                if (ypos >= m.getY() + m.getHeight() - 10 && ypos <= m.getY() + m.getHeight()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public boolean checkDownMove(int ypos) {
-        Vector<Mur> listesMur = getJeu().getListesMur();
-        for(int i = 0; i < listesMur.size(); i++) {
-            Mur m = listesMur.elementAt(i);
-            if((getX() <= m.getX() + m.getWidth() && getX() >= m.getX()) || (getX() + getWidth() <= m.getX() + m.getWidth() && getX() + getWidth() >= m.getX())) {
-                if (ypos + getHeight() >= m.getY() && ypos + getHeight() <= m.getY() + 10) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public boolean checkLeftMove(int xpos) {
-        Vector<Mur> listesMur = getJeu().getListesMur();
-        for(int i = 0; i < listesMur.size(); i++) {
-            Mur m = listesMur.elementAt(i);
-            if((getY() >= m.getY() && getY() <= m.getY() + m.getHeight()) || (getY() + getHeight() >= m.getY() && getY() + getHeight() <= m.getY() + m.getHeight())) {
-                if (xpos >= m.getX() + getWidth() && xpos <= m.getX() + getWidth() + 10) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public boolean checkRightMove(int xpos) {
-        Vector<Mur> listesMur = getJeu().getListesMur();
-        for(int i = 0; i < listesMur.size(); i++) {
-            Mur m = listesMur.elementAt(i);
-            if((getY() >= m.getY() && getY() <= m.getY() + m.getHeight()) || (getY() + getHeight() >= m.getY() && getY() + getHeight() <= m.getY() + m.getHeight())) {
-                if (xpos + getWidth() >= m.getX() && xpos + getWidth() <= m.getX() + 5) {
-                    return false;
-                }
-            }
+            if (x < 0 || x + getWidth() + 15 >= getJeu().getContainer().getWidth() || y < 0 || y + getHeight() + 40 >= getJeu().getContainer().getHeight()) return false;
+            if (x >= m.getX() && x <= m.getX() + m.getWidth() && y >= m.getY() && y <= m.getY() + m.getHeight()) return false;
+            if (x + getWidth() >= m.getX() && x + getWidth() <= m.getX() + m.getWidth() && y >= m.getY() && y <= m.getY() + m.getHeight()) return false;
+            if (x + getWidth() >= m.getX() && x + getWidth() <= m.getX() + m.getWidth() && y + getHeight() >= m.getY() && y + getHeight() <= m.getY() + m.getHeight()) return false;
+            if (x >= m.getX() && x <= m.getX() + m.getWidth() && y + getHeight() >= m.getY() && y + getHeight() <= m.getY() + m.getHeight()) return false;
         }
         return true;
     }
 
     public void processEsquive() {
-        if (System.currentTimeMillis() - getDebutEsquive() < 200) setVitesse(5);
+        if (System.currentTimeMillis() - getDebutEsquive() < 100) setVitesse(5);
         else setVitesse(1);
 
         // fin
-        if (System.currentTimeMillis() - getDebutEsquive() > 1000) {
+        if (System.currentTimeMillis() - getDebutEsquive() > 800) {
             setEsquive(false);
             setCanEsquive(true);
         }
@@ -277,6 +241,27 @@ public class Joueur extends GameObject {
 
     public void checkLife() {
         if (getVie() <= 0) setDead(true);
+    }
+
+    public void drawPointDeVie(Graphics graph) {
+        graph.setColor(Color.RED);
+        for(int i = getVie(); i > 0; i--) {
+            graph.fillOval(170 + 13 * (i - 1), 6, 10, 10);
+        }
+    }
+
+    public void drawScore(Graphics graph) {
+        graph.setColor(Color.BLUE);
+        graph.drawString("Point : " + getPoint(), 250, 15);
+        graph.setFont(new Font("Arial", Font.PLAIN, 12));
+    }
+
+    public void drawEsquiveMark(Graphics graph) {
+        // Dessine un cyan si on peut esquiver
+        if (getCanEsquive()) {
+            graph.setColor(Color.CYAN);
+            graph.fillOval(310, 6, 10, 10);
+        }
     }
 
     public void selfDraw(Graphics graph) {

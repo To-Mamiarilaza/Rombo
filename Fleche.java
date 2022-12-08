@@ -63,7 +63,7 @@ public class Fleche extends GameObject {
         setX(getProprietaire().getX());
         setVitesse(7);
         setY(getProprietaire().getY());
-        setLongueur(35);
+        setLongueur(25);
         setDemande(true);
     }
 
@@ -82,7 +82,7 @@ public class Fleche extends GameObject {
         for(int i = 0; i < listesJoueur.size(); i++) {
             Joueur j = listesJoueur.elementAt(i);
             if(getBalle()[0] > j.getX() && getBalle()[0] < j.getX() + j.getWidth() && getBalle()[1] > j.getY() && getBalle()[1] < j.getY() + j.getHeight()) {
-                getProprietaire().setPoint(getProprietaire().getPoint() + 1);
+                if (j.getVie() > 0) getProprietaire().setPoint(getProprietaire().getPoint() + 1);
                 j.setVie(j.getVie() - 1);
                 j.startCollision(this);
                 setTouche(true);

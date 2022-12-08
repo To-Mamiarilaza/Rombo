@@ -15,7 +15,10 @@ public class Partie {
     Joueur principale;
     Fenetre container;
     Board board;
+    String hoteIp;
     Client client;      // Interface pour l'interconnection
+    Server serveur;
+    boolean valider;
 
 /// Encapsulation
     public void setContainer(Fenetre container) {this.container = container;}
@@ -23,6 +26,9 @@ public class Partie {
 
     public void setListesMur(Vector<Mur> listesMur) {this.listesMur = listesMur;}
     public Vector<Mur> getListesMur() {return this.listesMur;}
+
+    public void setServeur(Server serveur) {this.serveur = serveur;}
+    public Server getServeur() {return this.serveur;}
 
     public void setClient(Client client) {this.client = client;}
     public Client getClient() {return this.client;}
@@ -36,43 +42,72 @@ public class Partie {
     public void setJoueurPrincipale(Joueur principale) {this.principale = principale;}
     public Joueur getJoueurPrincipale() {return this.principale;}
 
+    public void setHoteIp(String hoteIp) {this.hoteIp = hoteIp;}
+    public String getHoteIp() {return this.hoteIp;}
+
+    public void setValider(boolean valider) {this.valider = valider;}
+    public boolean getValider() {return this.valider;}
+
 /// Constructeur
     public Partie(Vector<Joueur> listesJoueur) {
         setListesJoueur(listesJoueur);
 
     }
 
-    public Partie(String mode, String joueurName, Fenetre container) {
-        setListesMur(new Vector<Mur>());
-        setListesJoueur(new Vector<Joueur>());
-        placeAllWall();
-        if(mode.equals("serveur")) new Server();
-        setJoueurPrincipale(new Joueur(joueurName, this));        // Ajout du joueur principale
-        getListesJoueur().add(getJoueurPrincipale());
-        joinServer();
-
-        setBoard(new Board(container, this));
-
-        // Conception du jeu
-        // getListesJoueur().add(new Joueur("To", this));
+    public Partie(String mode, String joueurName, Fenetre container, String hoteIp) {
+        try {
+            setContainer(container);
+            setListesMur(new Vector<Mur>());
+            setListesJoueur(new Vector<Joueur>());
+            setHoteIp(hoteIp);
+            placeAllWall();
+            if(mode.equals("serveur")) setServeur(new Server(this));
+            setJoueurPrincipale(new Joueur(joueurName, this));        // Ajout du joueur principale
+            getListesJoueur().add(getJoueurPrincipale());
+    
+            joinServer();
+    
+            if (getContainer().getMode().equals("serveur")) setValider(true);   
+            if (getValider()) {     // Si la connexion au serveur va bien
+                System.out.println("Le jeu commence");
+                setBoard(new Board(container, this));
+            }
+            else System.out.println("valider false");
+        }
+        catch(Exception e) {
+            getContainer().goToInput(e.getMessage());
+        }
     }
 
 /// Fonction de classe
+    public void quitter() {
+        try {
+            System.out.println("Mode " + getContainer().getMode());
+            if (getContainer().getMode().equals("serveur")) {
+                System.out.println("J'envoie le message de quit");
+                getClient().sendMessage("ServerQuit");
+                System.out.println("Fermeture serveur");
+                Thread.sleep(1000);
+                getServeur().fermerServeur();
+            }
+            getClient().sendMessage("Quitter:" + getJoueurPrincipale().getNom());        
+            getClient().fermer();
+            getContainer().goToAcceuil();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void placeAllWall() {
         // Place tous les mur
         getListesMur().add(new Mur(200, 150, 30));
-        getListesMur().add(new Mur(423, 500, 70));
+        getListesMur().add(new Mur(423, 300, 42));
         getListesMur().add(new Mur(76, 50, 40));
         getListesMur().add(new Mur(80, 250, 30));
-        getListesMur().add(new Mur(500, 245, 50));
-        getListesMur().add(new Mur(1000, 20, 50));
-        getListesMur().add(new Mur(1000, 750, 70));
-        getListesMur().add(new Mur(850, 400, 60));
-        getListesMur().add(new Mur(200, 580, 50));
-        getListesMur().add(new Mur(800, 700, 20));
-        getListesMur().add(new Mur(1300, 400, 70));
-        getListesMur().add(new Mur(1200, 650, 45));
-        getListesMur().add(new Mur(1200, 650, 45));
+        getListesMur().add(new Mur(354, 200, 37));
+        getListesMur().add(new Mur(270, 80, 28));
+        getListesMur().add(new Mur(240, 300, 33));
+        getListesMur().add(new Mur(400, 30, 36));
     }
 
     public Joueur findJoueur(String nom) throws Exception {
@@ -81,7 +116,7 @@ public class Partie {
                 return getListesJoueur().elementAt(i);
             }
         }
-        throw new Exception("Ce joueur : " + nom + " n'existe pas !");
+        return null;
     }
 
     public void removeJoueur(Joueur joueur) {
@@ -101,8 +136,8 @@ public class Partie {
         return resultat;
     }
 
-    public void joinServer() {
-        setClient(new Client(this));
+    public void joinServer() throws Exception {
+        setClient(new Client(this, hoteIp));
     }
 
     public void addJoueur(String nom) {

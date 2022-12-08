@@ -47,28 +47,6 @@ public class Listen extends Thread {
         }
     }
 
-    public void sendMessage(String message, Socket envoyeur, Server server) {
-        /// Pour envoyer message a tous les clients 
-        int indiceSocket = 0;
-        try {
-            if(message.startsWith("Initialisation:") && message.endsWith("Recu")) {
-                findDestination(message, server);
-            }
-            else {
-                for(int i = 0; i < server.getOutputListes().size(); i++) {
-                    indiceSocket = i;   // l'indice du socket a effacer si il y a erreur
-                    if(!server.getClients().elementAt(i).equals(envoyeur)) {
-                        server.getOutputListes().elementAt(i).writeUTF(message);
-                        server.getOutputListes().elementAt(i).flush();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            server.getOutputListes().removeElementAt(indiceSocket);    // On jette
-        }
-    }
-
     public void ecouteMessage() {
         /// Ecoute les message provenant de ce client
         try {
@@ -77,7 +55,6 @@ public class Listen extends Thread {
                 if (getMode() instanceof Server) {
                     Server serv = (Server) getMode();
                     serv.sendMessage(message, getClient());      // Test self distribution       // Exact
-                    // sendMessage(message, getClient(), serv);
                 }
                 else {
                     Client action = (Client) getMode();
@@ -85,7 +62,7 @@ public class Listen extends Thread {
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            this.stop();
             e.printStackTrace();
         }
     }

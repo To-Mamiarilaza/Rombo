@@ -38,11 +38,11 @@ public class Client extends ConnectionMode {
     public DataSender getPartageur() {return this.partageur;}
 
 /// Constructeur
-    public Client(Partie jeu) {
+    public Client(Partie jeu, String hoteIp) throws Exception {
         try {
-            System.out.println("Demande d'adhesion au serveur");
-            setSocket(new Socket("localhost", 6666));
             setJeu(jeu);
+            System.out.println("Demande d'adhesion au serveur");
+            setSocket(new Socket(hoteIp, 6666));
             System.out.println("Connection effectue !");
             setOutput(new DataOutputStream(getSocket().getOutputStream()));     // prepare le tyau d' envoie
             setInput(new DataInputStream(getSocket().getInputStream()));
@@ -55,16 +55,19 @@ public class Client extends ConnectionMode {
             
             Thread.sleep(2000);     // Attendre 2 seconde pour l'etablissement
             getDistributeur().setReady(true);
-            
+
             // setPartageur(new DataSender(getSocket(), getJeu()));
 
             // testMessage();
         } catch(Exception e) {
             e.printStackTrace();
+            throw new Exception("Verifier l'adresse Ip !");
+            // getJeu().getContainer().goToInput("Verifier l'adresse Ip !");
         }
     }
 
 /// Fonctions de classe
+
     public void testMessage() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -81,6 +84,18 @@ public class Client extends ConnectionMode {
         try {
             getOutput().writeUTF(message);
             getOutput().flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void fermer() {
+        try {
+            getEcouteur().stop();
+            getOutput().close();
+            getInput().close();
+            getSocket().close();
+            System.out.println("Bonjour");
         } catch (Exception e) {
             e.printStackTrace();
         }
