@@ -151,19 +151,19 @@ public class Joueur extends GameObject {
     public void move() {
         if (up) {
             setY(getY() - getVitesse());
-            getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
+            getJeu().getClient().sendMessage("Y:" + getNom() + ",Y:" + getY());
         }
         if (down) {
             setY(getY() + getVitesse());
-            getJeu().getClient().sendMessage("MouvementY:" + getNom() + ",Y:" + getY());
+            getJeu().getClient().sendMessage("Y:" + getNom() + ",Y:" + getY());
         } 
         if (left) {
             setX(getX() - getVitesse());
-            getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
+            getJeu().getClient().sendMessage("X:" + getNom() + ",X:" + getX());
         }
         if (right)  {
             setX(getX() + getVitesse());
-            getJeu().getClient().sendMessage("MouvementX:" + getNom() + ",X:" + getX());
+            getJeu().getClient().sendMessage("X:" + getNom() + ",X:" + getX());
         }
     }
 

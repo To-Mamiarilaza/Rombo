@@ -101,10 +101,10 @@ public class Distributeur {
     public void actionJoueur(String code) throws Exception {
         // Traduis le code en action
         // Joueur:To,X:200,Y:350,Angle:280,Vitesse:18,tir:false
-        // MouvementX:To,X:200
-        // MouvementY:To,Y:200
-        // Angle:To,Angle:45
-        // Tir:To,tir:true
+        // X:To,X:200
+        // Y:To,Y:200
+        // A:To,A:45
+        // T:To,T:true
         // Quitter:Niavo
 
         String[] division = code.split(","); 
@@ -113,19 +113,19 @@ public class Distributeur {
         if (marionette == null) return;     // si il y a des poussieres
 
         switch (division[0].split(":")[0]) {
-            case "MouvementX":
+            case "X":
                 marionette.setX(Integer.valueOf(division[1].split(":")[1])); 
                 break;
         
-            case "MouvementY":
+            case "Y":
                 marionette.setY(Integer.valueOf(division[1].split(":")[1])); 
                 break;
 
-            case "Angle":
+            case "A":
                 marionette.setAngle(Integer.valueOf(division[1].split(":")[1])); 
                 break;
 
-            case "Tir":
+            case "T":
                 marionette.setTir(Boolean.valueOf(division[1].split(":")[1])); 
                 break;
             

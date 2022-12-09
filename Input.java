@@ -35,7 +35,7 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
         if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
         if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
             getJoueur().setTir(true);
-            getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+            getClient().sendMessage("T:" + getJoueur().getNom() + ",T:true");
         }
     }
     public void mouseEntered(MouseEvent e) {
@@ -81,7 +81,7 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
             if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                 if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
                     getJoueur().setTir(true);
-                    getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+                    getClient().sendMessage("T:" + getJoueur().getNom() + ",T:true");
                 }
             }
         }
@@ -128,11 +128,11 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
         if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
         if(getJoueur().getDebutCollision() == 0) {
             getJoueur().setAngle(findAngle(e.getX(), e.getY()));
-            getJoueur().getJeu().getClient().sendMessage("Angle:" + getJoueur().getNom() + ",angle:" + getJoueur().getAngle());
+            getJoueur().getJeu().getClient().sendMessage("A:" + getJoueur().getNom() + ",A:" + getJoueur().getAngle());
         }
         if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
             getJoueur().setTir(true);
-            getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+            getClient().sendMessage("T:" + getJoueur().getNom() + ",T:true");
         }
     }
 
@@ -140,7 +140,7 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
         if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
         if(getJoueur().getDebutCollision() == 0) {
             getJoueur().setAngle(findAngle(e.getX(), e.getY()));
-            getJoueur().getJeu().getClient().sendMessage("Angle:" + getJoueur().getNom() + ",angle:" + getJoueur().getAngle());
+            getJoueur().getJeu().getClient().sendMessage("A:" + getJoueur().getNom() + ",A:" + getJoueur().getAngle());
         }
     }
 }
