@@ -43,7 +43,7 @@ public class ConnectionServerClient extends Thread {
         try {
             listenClient();
         } catch(Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

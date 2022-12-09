@@ -53,9 +53,7 @@ public class Distributeur {
 
     public boolean checkDoublon(Joueur nouveau) {
         //Empeche les joueurs de meme nom
-        System.out.println("Nombre de joueur : " + getJeu().getListesJoueur().size());
         for(int i = 0; i < getJeu().getListesJoueur().size(); i++) {
-            System.out.println("--> " + getJeu().getListesJoueur().elementAt(i).getNom());
             if (getJeu().getListesJoueur().elementAt(i).getNom().equals(nouveau.getNom())) {
                 return true;
             }
@@ -64,33 +62,39 @@ public class Distributeur {
     }
 
     public void initialisation(String code) throws Exception {
-        // Initialisation:Koto,color1:214-231-75,color2:117-35-28,port:66522,X:300,Y:400
-        String[] division = code.split(",");
-        Joueur nouveau = new Joueur(division[0].split(":")[1], getJeu());
-        
-        if(division[1].equals("Erreur")) {   // Verifie si c'est une reponse d'erreur
-            getJeu().setValider(false);
-            getJeu().getContainer().goToInput("Le nom doit etre unique !");
-            throw new Exception("Le nom doit etre unique !");
-        } else {
-            getJeu().setValider(true);
-        }
-
-        nouveau.setX(Integer.valueOf(division[4].split(":")[1]));
-        nouveau.setY(Integer.valueOf(division[5].split(":")[1]));
-        nouveau.setAngle(Integer.valueOf(division[6].split(":")[1]));
-        nouveau.setCouleur(decodageCouleur(division));
-
-        if(!checkDoublon(nouveau)) {        // si il n'y a pas de doublons on procede normallement
-            getJeu().getListesJoueur().add(nouveau);
-            if(!code.endsWith("Recu")) {
-                code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() + ",port:" + division[3].split(":")[1] + ",X:" + getJeu().getJoueurPrincipale().getX() + ",Y:" + getJeu().getJoueurPrincipale().getY() + ",Angle:" + getJeu().getJoueurPrincipale().getAngle() + ",Recu";
+        // Initialisation:Koto,color1:214-231-75,color2:117-35-28,port:66522,X:300,Y:400,Angle:-52,Vie:3
+        try {
+            String[] division = code.split(",");
+            Joueur nouveau = new Joueur(division[0].split(":")[1], getJeu());
+            
+            if(division[1].equals("Erreur")) {   // Verifie si c'est une reponse d'erreur
+                getJeu().setValider(false);
+                getJeu().getContainer().goToInput("Le nom doit etre unique !");
+                throw new Exception("Le nom doit etre unique !");
+            } else {
+                getJeu().setValider(true);
+            }
+    
+            nouveau.setX(Integer.valueOf(division[4].split(":")[1]));
+            nouveau.setY(Integer.valueOf(division[5].split(":")[1]));
+            nouveau.setAngle(Integer.valueOf(division[6].split(":")[1]));
+            nouveau.setVie(Integer.valueOf(division[7].split(":")[1]));
+            nouveau.setCouleur(decodageCouleur(division));
+    
+            if(!checkDoublon(nouveau)) {        // si il n'y a pas de doublons on procede normallement
+                getJeu().getListesJoueur().add(nouveau);
+                if(!code.endsWith("Recu")) {
+                    code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() + ",port:" + division[3].split(":")[1] + ",X:" + getJeu().getJoueurPrincipale().getX() + ",Y:" + getJeu().getJoueurPrincipale().getY() + ",Angle:" + getJeu().getJoueurPrincipale().getAngle() + ",Vie:" + getJeu().getJoueurPrincipale().getVie() + ",Recu";
+                    getClient().sendMessage(code);
+                }
+            }
+            else {
+                code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + ",Erreur,Erreur" + ",port:" + division[3].split(":")[1] + ",Recu";
                 getClient().sendMessage(code);
             }
-        }
-        else {
-            code = "Initialisation:" + getJeu().getJoueurPrincipale().getNom() + ",Erreur,Erreur" + ",port:" + division[3].split(":")[1] + ",Recu";
-            getClient().sendMessage(code);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
         }
     }
 
@@ -108,7 +112,6 @@ public class Distributeur {
 
         if (marionette == null) return;     // si il y a des poussieres
 
-        System.out.println("Code : " + division[0].split(":")[0]);
         switch (division[0].split(":")[0]) {
             case "MouvementX":
                 marionette.setX(Integer.valueOf(division[1].split(":")[1])); 
@@ -130,9 +133,9 @@ public class Distributeur {
                 getJeu().removeJoueur(getJeu().findJoueur(division[0].split(":")[1]));
                 break;
 
-            // case "ServerQuit":
-            //     getJeu().quitter();
-            //     break;
+            case "ServeurQuit":
+                getJeu().quitter();
+                break;
 
             default:
                 break;

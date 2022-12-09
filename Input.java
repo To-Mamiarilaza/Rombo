@@ -53,6 +53,12 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
 
     /// Fonctions de deplacements
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            int answer = JOptionPane.showConfirmDialog(getJoueur().getJeu().getContainer(), "Voulez vous vraiment quitter ?");
+            if (answer == JOptionPane.YES_OPTION) {
+                getJoueur().getJeu().quitter();
+            }
+        }
         if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
         if(getJoueur().getDebutCollision() == 0) {
             if (e.getKeyCode() == KeyEvent.VK_UP) {
@@ -70,12 +76,6 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
             if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
                 if (getJoueur().getCanEsquive()) {
                     getJoueur().setEsquive(true);
-                }
-            }
-            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                int answer = JOptionPane.showConfirmDialog(getJoueur().getJeu().getContainer(), "Voulez vous vraiment quitter ?");
-                if (answer == JOptionPane.YES_OPTION) {
-                    getJoueur().getJeu().quitter();
                 }
             }
             if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -125,6 +125,15 @@ public class Input implements MouseListener, KeyListener, MouseMotionListener {
     }
 
     public void mouseDragged(MouseEvent e) {
+        if (getJoueur().getDead()) return; // si le joueur est mort on ne peut rien faire
+        if(getJoueur().getDebutCollision() == 0) {
+            getJoueur().setAngle(findAngle(e.getX(), e.getY()));
+            getJoueur().getJeu().getClient().sendMessage("Angle:" + getJoueur().getNom() + ",angle:" + getJoueur().getAngle());
+        }
+        if (getJoueur().getDebutCollision() == 0 && !getJoueur().getFlecheActive().getTir()) {
+            getJoueur().setTir(true);
+            getClient().sendMessage("Tir:" + getJoueur().getNom() + ",tir:true");
+        }
     }
 
     public void mouseMoved(MouseEvent e) {

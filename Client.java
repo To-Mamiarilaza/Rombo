@@ -41,15 +41,13 @@ public class Client extends ConnectionMode {
     public Client(Partie jeu, String hoteIp) throws Exception {
         try {
             setJeu(jeu);
-            System.out.println("Demande d'adhesion au serveur");
             setSocket(new Socket(hoteIp, 6666));
-            System.out.println("Connection effectue !");
             setOutput(new DataOutputStream(getSocket().getOutputStream()));     // prepare le tyau d' envoie
             setInput(new DataInputStream(getSocket().getInputStream()));
             setDistributeur(new Distributeur(this));
 
 
-            sendMessage("Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() +",port:" + getSocket().getLocalPort() + ",X:" + getJeu().getJoueurPrincipale().getX() + ",Y:" + getJeu().getJoueurPrincipale().getY() + ",Angle:" + getJeu().getJoueurPrincipale().getAngle());
+            sendMessage("Initialisation:" + getJeu().getJoueurPrincipale().getNom() + getJeu().prepareColorCode() +",port:" + getSocket().getLocalPort() + ",X:" + getJeu().getJoueurPrincipale().getX() + ",Y:" + getJeu().getJoueurPrincipale().getY() + ",Angle:" + getJeu().getJoueurPrincipale().getAngle() + ",Vie:" + getJeu().getJoueurPrincipale().getVie());
 
             setEcouteur(new Listen(getSocket(), this));
             
@@ -60,7 +58,7 @@ public class Client extends ConnectionMode {
 
             // testMessage();
         } catch(Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             throw new Exception("Verifier l'adresse Ip !");
             // getJeu().getContainer().goToInput("Verifier l'adresse Ip !");
         }
@@ -85,19 +83,18 @@ public class Client extends ConnectionMode {
             getOutput().writeUTF(message);
             getOutput().flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
     public void fermer() {
         try {
-            getEcouteur().stop();
             getOutput().close();
             getInput().close();
             getSocket().close();
-            System.out.println("Bonjour");
+            getEcouteur().interrupt();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 }

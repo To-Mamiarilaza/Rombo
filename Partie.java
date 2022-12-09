@@ -69,10 +69,8 @@ public class Partie {
     
             if (getContainer().getMode().equals("serveur")) setValider(true);   
             if (getValider()) {     // Si la connexion au serveur va bien
-                System.out.println("Le jeu commence");
                 setBoard(new Board(container, this));
             }
-            else System.out.println("valider false");
         }
         catch(Exception e) {
             getContainer().goToInput(e.getMessage());
@@ -80,19 +78,28 @@ public class Partie {
     }
 
 /// Fonction de classe
+    public void relancement() {
+        for(int i = 0; i < getListesJoueur().size(); i++) {
+            getListesJoueur().elementAt(i).setVie(5);
+            getListesJoueur().elementAt(i).setDead(false);
+            getListesJoueur().elementAt(i).setReadyToBattle(false);
+        }
+    }
+
     public void quitter() {
         try {
-            System.out.println("Mode " + getContainer().getMode());
             if (getContainer().getMode().equals("serveur")) {
-                System.out.println("J'envoie le message de quit");
-                getClient().sendMessage("ServerQuit");
-                System.out.println("Fermeture serveur");
-                Thread.sleep(1000);
+                getClient().sendMessage("ServeurQuit:" + getJoueurPrincipale().getNom());
+                Thread.sleep(50);
                 getServeur().fermerServeur();
+                getClient().fermer();
+                getContainer().goToAcceuil();
             }
-            getClient().sendMessage("Quitter:" + getJoueurPrincipale().getNom());        
-            getClient().fermer();
-            getContainer().goToAcceuil();
+            else {
+                getClient().sendMessage("Quitter:" + getJoueurPrincipale().getNom());        
+                getClient().fermer();
+                getContainer().goToAcceuil();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,13 +149,11 @@ public class Partie {
 
     public void addJoueur(String nom) {
         /// Permet d'ajouter un joueur au jeu
-        System.out.println("Un nouveau joueur entre : " + nom);
         Joueur nouveau = new Joueur(nom, this);
         getListesJoueur().add(nouveau);
     }
 
     public void stopPartie() {
-        System.out.println("Le nom de joueur doit etre unique !");
         System.exit(1);
     }
 }

@@ -81,7 +81,7 @@ public class Fleche extends GameObject {
         Vector<Joueur> listesJoueur = getProprietaire().getJeu().getListesJoueur();
         for(int i = 0; i < listesJoueur.size(); i++) {
             Joueur j = listesJoueur.elementAt(i);
-            if(getBalle()[0] > j.getX() && getBalle()[0] < j.getX() + j.getWidth() && getBalle()[1] > j.getY() && getBalle()[1] < j.getY() + j.getHeight()) {
+            if(j.getReadyToBattle() && getBalle()[0] > j.getX() && getBalle()[0] < j.getX() + j.getWidth() && getBalle()[1] > j.getY() && getBalle()[1] < j.getY() + j.getHeight()) {
                 if (j.getVie() > 0) getProprietaire().setPoint(getProprietaire().getPoint() + 1);
                 j.setVie(j.getVie() - 1);
                 j.startCollision(this);

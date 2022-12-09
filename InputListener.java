@@ -30,6 +30,9 @@ public class InputListener implements ActionListener {
         if (bouton.getText().equals("Retour")) {
             getFenetre().goToAcceuil();
         }
+        else if (getInputFrame().getLabelNom().getText().equals("") || getInputFrame().getLabelNom().getText().contains(" ")) {
+            getFenetre().goToInput("Remplir les champs svp ");
+        }
         else {
             getFenetre().setNomJoueur(getInputFrame().getLabelNom().getText());
             if (getFenetre().getMode().equals("serveur")) {

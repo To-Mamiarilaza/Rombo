@@ -83,7 +83,7 @@ public class Server extends ConnectionMode {
         } catch (Exception e) {
             getOutputListes().removeElementAt(indiceSocket);    // On jette
             getClients().removeElementAt(indiceSocket);
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -95,7 +95,7 @@ public class Server extends ConnectionMode {
                 sendMessage(reader.readLine(), null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -106,7 +106,7 @@ public class Server extends ConnectionMode {
             socket.close();
         } catch (Exception e) {
             // TODO: handle exception
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

@@ -28,6 +28,8 @@ public class Joueur extends GameObject {
     int vie;
     boolean dead;
     boolean canEsquive;     // true si on a le droit d'esquiver
+    boolean readyToBattle;  // empeche les nouveaux d'etre touche
+    long tempsPenetration;  // temps d'entree en jeu
 
     /// Pour les key de deplacements
     protected boolean up = false;
@@ -100,13 +102,24 @@ public class Joueur extends GameObject {
     public void setCanEsquive(boolean canEsquive) {this.canEsquive = canEsquive;}
     public boolean getCanEsquive() {return this.canEsquive;}
 
+    public void setReadyToBattle(boolean readyToBattle) {
+        if (!readyToBattle) setTempsPenetration(System.currentTimeMillis());
+        this.readyToBattle = readyToBattle;
+    }
+    public boolean getReadyToBattle() {return this.readyToBattle;}
+
+    public void setTempsPenetration(long tempsPenetration) {this.tempsPenetration = tempsPenetration;}
+    public long getTempsPenetration() {return this.tempsPenetration;}
+
 /// Constructeur
     public Joueur(String nom, Partie jeu) {
         setNom(nom);
         // setInitialPosition();
         setJeu(jeu);
+
         setX(300);
         setY(300);
+
         setAngle(0);
         setVitesse(1);
         setWidth(30);
@@ -114,10 +127,13 @@ public class Joueur extends GameObject {
         setPoint(0);
         setActif(0);
         setVie(5);
-        setDead(false);
-        setCanEsquive(true);
+
         prepareCouleur();
         prepareJoueurFleche();
+
+        setDead(false);
+        setCanEsquive(true);
+        setReadyToBattle(false);
     }
 
 /// Fonctions de classe
@@ -152,6 +168,14 @@ public class Joueur extends GameObject {
     }
 
     /// Verification des deplacement possible
+    public void battlePreparation(Graphics graph) {
+        graph.setColor(Color.WHITE);
+        graph.drawRect(getX() - 5, getY() - 5, getWidth() + 10, getHeight() + 10);
+        if (System.currentTimeMillis() - getTempsPenetration() > 5000) {
+            setReadyToBattle(true);
+        }
+    }
+
     public boolean isFree(int x, int y) {
         Vector<Mur> listesMur = getJeu().getListesMur();
         for(int i = 0; i < listesMur.size(); i++) {
@@ -178,7 +202,6 @@ public class Joueur extends GameObject {
 
     public void startCollision(Fleche tireur) {
         setDebutCollision(System.currentTimeMillis());
-        System.out.println("Ma vie est : " + getVie());
         setTireur(tireur);
     }
 
@@ -268,8 +291,13 @@ public class Joueur extends GameObject {
         /// Chaque player dessine eux meme
         if (esquive) processEsquive();
         checkRotation();        
+        if (!getReadyToBattle()) battlePreparation(graph);
 
+        // Nom du joueur
         graph.setColor(getCouleur()[0]);       // Couleur principale
+        graph.setFont(new Font("Arial", Font.PLAIN, 10));
+        graph.drawString(getNom(), getX(), getY() - 5);
+
         graph.fillOval(getX(), getY(), getWidth(), getHeight());        // Le corp du joueur
         graph.setColor(getCouleur()[1]);
         graph.fillOval(getX() + (getWidth() / 2) - (getWidth() / 4), getY() + (getHeight() / 2) - (getHeight() / 4), getWidth() / 2, getHeight() / 2);      // Le centre du joueur
@@ -290,11 +318,4 @@ public class Joueur extends GameObject {
         return resultat;
     }
 
-    public void detailJoueur() {
-        /// Montre le detail de chaque joueur
-        System.out.println("Detail du Joueur : " + getNom());
-        System.out.println("--> X position   : " + getX());
-        System.out.println("--> Y position   : " + getY());
-        System.out.println("--> Point        : " + getPoint());
-    }
 }

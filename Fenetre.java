@@ -51,7 +51,6 @@ public class Fenetre extends JFrame {
         if(getInputFrame() != null) this.remove(getInputFrame());
         transferFocus();
         setPartie(new Partie(getMode(), getNomJoueur(), this, getIp()));
-        System.out.println("Adresse du Partie : " + getPartie());
     }
 
     public void goToAcceuil() {
