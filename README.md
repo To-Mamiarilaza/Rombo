@@ -1,10 +1,14 @@
 # Rombo
 Jeu multijoueur en reseau local
 
-Le server est a la fois un client.
-Pour lancer le serveur , je n'ai pas encore reussie a  simplifié.
-On change  le mode dans le board. puis on choisi le nom de joueur dans partie.
+Vous avez juste besoin d'un jdk et vous pouvez jouer entre vos amis
 
-Puis  pour  le client , on change le serveur et le mode dans le board et le nom des joueurs ne doit pas etre le meme
+Les commandes :
+  - les directions pour le deplacement
+  - control pour esquiver
+  - souris pour viser
+  - clique pour tirer
+  
+Entrer dans le cmd et tapez java main.Main ou lancer jouer.bat pour jouer
 
 copyright : To Mamiarilaza
